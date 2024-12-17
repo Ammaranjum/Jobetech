@@ -1,11 +1,18 @@
-# Full Stack Job Portal with React JS, Tailwind CSS, Supabase, Clerk, Shadcn UI Tutorial 🔥🔥
-## https://www.youtube.com/watch?v=2XF-HgauItk
-![hirrd 1](https://github.com/user-attachments/assets/1da23b25-1f29-4402-be74-03685d9b732d)
+#Connecting supabase wth Clerk
+Creating a JWT template in clerk
+get a jwt key from supabase
+put in clerk jwt template secret
 
-### Make sure to create a `.env` file with following variables -
+#supabase accesing user ids from clerk
+write aquery in sql editor (query availabe in docs)
+function requesting_user_ids()
 
-```
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-VITE_CLERK_PUBLISHABLE_KEY=
-```
+when creating table wherever the user id is referenced, use the call requesting_user_id() function
+
+#Row Level Secruity in Supabase Tables:
+1). Jobs :Enable read access for auth users target roles : authenticated
+2). Companies : Enable read access for auth users target roles : authenticated
+3). Saved Jobs : (we only want to show the jobs which are wishlisted by the currrent user only)
+Enable read access for current users target roles : authenticated, RULE : using (requesting_user_id()=user_id )
+
+#Creating Storage Bucket in SUpabase for resumes and logos of companies
