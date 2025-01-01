@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { BarLoader } from "react-spinners";
 import MDEditor from "@uiw/react-md-editor";
@@ -59,13 +60,18 @@ const JobPage = () => {
         <img src={job?.company?.logo_url} className="h-12" alt={job?.title} />
       </div>
 
-      <div className="flex justify-between ">
-        <div className="flex gap-2">
-          <MapPinIcon /> {job?.location}
-        </div>
-        <div className="flex gap-2">
-          <Briefcase /> {job?.applications?.length} Applicants
-        </div>
+      <div className="flex justify-between text-gray-700">
+  {/* Job Location */}
+  <div className="flex gap-2 items-center">
+    <MapPinIcon className="text-blue-500" /> 
+    <span>{job?.location}</span>
+  </div>
+
+  {/* Number of Applicants */}
+  <div className="flex gap-2 items-center">
+    <Briefcase className="text-green-500" /> 
+    <span>{job?.applications?.length} Applicants</span>
+  </div>
         <div className="flex gap-2">
           {job?.isOpen ? (
             <>
@@ -103,10 +109,14 @@ const JobPage = () => {
       <h2 className="text-2xl sm:text-3xl font-bold">
         What we are looking for
       </h2>
-      <MDEditor.Markdown
-        source={job?.requirements}
-        className="bg-transparent sm:text-lg" // add global ul styles - tutorial
-      />
+      {job?.requirments ? (
+        <MDEditor.Markdown
+          source={job?.requirments}
+          className="bg-transparent sm:text-lg"
+        />
+      ) : (
+        <p>No requirements available</p>
+      )}
       {job?.recruiter_id !== user?.id && (
         <ApplyJobDrawer
           job={job}

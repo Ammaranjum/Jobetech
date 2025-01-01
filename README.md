@@ -20,3 +20,19 @@ when creating table wherever the user id is referenced, use the call requesting_
 Enable read access for current users target roles : authenticated, RULE : using (requesting_user_id()=user_id )
 
 #Creating Storage Bucket in SUpabase for resumes and logos of companies
+
+#Policy for Saved_jobs:
+Enable insert for authenticated users only
+Enable delete for users based on user_id (requesting_user_id() = user_id)
+
+#JobListing Search Filter
+made changes so it only let you search by the cities of which jobs are posted,
+
+#Policy for applications:
+Enable read access for all users
+Enable insert for authenticated users only
+
+#Policy for jobs:
+Enable update by recuriter_id
+target roles: authenticated
+(requesting_user_id()=recruiter_id)

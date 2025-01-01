@@ -15,9 +15,10 @@
     "id": 11
   },
   {
-    "name": "devsinc",
-    "path": "/companies/Devsinc.png",
+    "name": "PikeSoft",
+    "path": "/companies/pikessoft.svg",
     "id": 12
+    
   },
   {
     "name": "folio3",
@@ -31,12 +32,17 @@
   },
   {
     "name": "netsol",
-    "path": "/companies/NetSol.png",
+    "path": "/companies/NetSol.svg",
     "id": 15
   },
   {
     "name": "systems",
     "path": "/companies/Systems.svg",
-    "id": 8
+    "id": 16
+  },
+  {
+    "name": "devsinc",
+    "path": "/companies/Devsinc.png",
+    "id": 17
   }
 ]
