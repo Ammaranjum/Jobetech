@@ -1,0 +1,38 @@
+[
+  {
+    "question": "What is JobeeTech?",
+    "answer": "JobeeTech is a job portal platform that brings job seekers and employers closer. It enables companies to post job listings and the candidates to search, save, and apply for jobs easily. The platform delivers a seamless experience with secure authentication and user-friendly interfaces."
+  },
+  {
+    "question": "How do I post a job?",
+    "answer": "You have to log in to your JobeeTech employer account, then click on the 'Post a Job' option. Enter the details you want in the job listing, including title, description, location, and salary, and then submit it for approval. Once approved, it will appear live"
+  },
+  {
+    "question": "How can I search for jobs?",
+    "answer": "The site has search filters by keyword, location, category, and other preferences. Use the search bar on the homepage or check the dedicated 'Job Search' page to refine the results"
+  },
+  {
+    "question": "How do I apply for a job?",
+    "answer": "To apply for a job, click on the job listing and follow the provided instructions. You may need to upload your resume and fill in your details. Ensure all required fields are completed before submitting the application."
+  },
+  {
+    "question": "Can I save jobs to apply later?",
+    "answer": "Yes, you can save jobs by clicking on the 'Save Job' button on any job listing. Saved jobs can be accessed anytime from your profile under the 'Saved Jobs' section."
+  },
+  {
+    "question": "How do I track my job applications?",
+    "answer": "Job seekers can view the status of their applications from the 'Applications' section in their profile. Here, you can see updates and progress for every job application you have applied for."
+  },
+  {
+    "question": "How do I update my profile information?",
+    "answer": "To update your profile, log in to your JobeeTech account and go to the 'Profile' section. From here, you can edit your personal details, upload a new resume, and add skills or qualifications"
+  },
+  {
+    "question": "How do I contact the employer after applying?",
+    "answer": "If the job listing has contact details, you can contact them directly. If not, the employers will contact you through the JobeeTech messaging system in case your application progresses.."
+  },
+  {
+    "question": "How do I delete my account?",
+    "answer": "To delete your account, go to your profile 'Settings' and select 'Delete Account'. Then confirm the request. Be aware that this action cannot be undone."
+  }
+]

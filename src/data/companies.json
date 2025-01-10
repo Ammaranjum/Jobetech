@@ -1,0 +1,48 @@
+[
+  {
+    "name": "10Pears",
+    "path": "/companies/10P-Logo.svg",
+    "id": 9
+  },
+  {
+    "name": "arbisoft",
+    "path": "/companies/arbisoft logo.svg",
+    "id": 10
+  },
+  {
+    "name": "contour",
+    "path": "/companies/Contour-Software.svg",
+    "id": 11
+  },
+  {
+    "name": "PikeSoft",
+    "path": "/companies/pikessoft.svg",
+    "id": 12
+    
+  },
+  {
+    "name": "folio3",
+    "path": "/companies/folio3_logo.webp",
+    "id": 13
+  },
+  {
+    "name": "i2c",
+    "path": "/companies/i2cinc.svg",
+    "id": 14
+  },
+  {
+    "name": "netsol",
+    "path": "/companies/NetSol.svg",
+    "id": 15
+  },
+  {
+    "name": "systems",
+    "path": "/companies/Systems.svg",
+    "id": 16
+  },
+  {
+    "name": "devsinc",
+    "path": "/companies/Devsinc.png",
+    "id": 17
+  }
+]
