@@ -2,7 +2,6 @@ import { getCompanies } from "@/api/apiCompanies";
 import { addNewJob } from "@/api/apiJobs";
 import AddCompanyDrawer from "@/components/add-company-drawer";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -18,23 +17,29 @@ import { useUser } from "@clerk/clerk-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MDEditor from "@uiw/react-md-editor";
 import { City } from "country-state-city";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // Import useState
 import { Controller, useForm } from "react-hook-form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 import { z } from "zod";
+import CustomQuestions from "./test.jsx"; // Import the new component
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
   location: z.string().min(1, { message: "Select a location" }),
   company_id: z.string().min(1, { message: "Select or Add a new Company" }),
-  requirments: z.string().min(1, { message: "requirments are required" }),
+  requirments: z.string().min(1, { message: "Requirements are required" }),
 });
 
 const PostJob = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
+  const [showQuestions, setShowQuestions] = useState(false); // State to control visibility
+
+  const handleAddMoreQuestions = () => {
+    setShowQuestions((prev) => !prev); // Toggle visibility
+  };
 
   const {
     register,
@@ -63,7 +68,7 @@ const PostJob = () => {
 
   useEffect(() => {
     if (dataCreateJob?.length > 0) navigate("/jobs");
-  }, [loadingCreateJob]);
+  }, [dataCreateJob]);
 
   const {
     loading: loadingCompanies,
@@ -75,7 +80,6 @@ const PostJob = () => {
     if (isLoaded) {
       fnCompanies();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
 
   if (!isLoaded || loadingCompanies) {
@@ -168,14 +172,28 @@ const PostJob = () => {
         {errors.requirments && (
           <p className="text-red-500">{errors.requirments.message}</p>
         )}
-        {errors.errorCreateJob && (
-          <p className="text-red-500">{errors?.errorCreateJob?.message}</p>
-        )}
         {errorCreateJob?.message && (
-          <p className="text-red-500">{errorCreateJob?.message}</p>
+          <p className="text-red-500">{errorCreateJob.message}</p>
         )}
         {loadingCreateJob && <BarLoader width={"100%"} color="#36d7b7" />}
-        <Button type="testScreen" variant="link" size="lg" className="mt-2"> Add more Questions </Button>
+
+        {/* Add more questions */}
+        <Button
+          type="button"
+          variant="link"
+          size="lg"
+          className="mt-2"
+          onClick={handleAddMoreQuestions}
+        >
+          {showQuestions ? "Hide Questions" : "Add More Questions"}
+        </Button>
+
+        {showQuestions && (
+          <div className="mt-4">
+            <CustomQuestions />
+          </div>
+        )}
+
         <Button type="submit" variant="blue" size="lg" className="mt-2">
           Submit
         </Button>

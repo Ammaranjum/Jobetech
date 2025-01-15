@@ -39,9 +39,6 @@ const RecruiterMCQsPage = () => {
     <div className="p-6 max-w-6xl mx-auto bg-gray-900 text-white">
       <header className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Manage MCQ Questions</h1>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Add New Job
-        </button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
