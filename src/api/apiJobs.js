@@ -166,3 +166,29 @@ export async function addNewJob(token, _, jobData) {
 
   return data;
 }
+
+export async function addQuestionToDatabase(token, questionData) {
+  const supabase = await supabaseClient(token);
+
+  // Assuming the questions table has fields: question, option1, option2, option3, option4, ans
+  const { data, error } = await supabase
+    .from("questions")
+    .insert([
+      {
+        question: questionData.question,
+        option1: questionData.option1,
+        option2: questionData.option2,
+        option3: questionData.option3,
+        option4: questionData.option4,
+        ans: questionData.ans,  // This corresponds to the index of the correct option
+      },
+    ])
+    .select();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Error saving question to the database");
+  }
+
+  return data;
+}

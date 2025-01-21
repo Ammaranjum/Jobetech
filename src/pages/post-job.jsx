@@ -17,12 +17,11 @@ import { useUser } from "@clerk/clerk-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MDEditor from "@uiw/react-md-editor";
 import { City } from "country-state-city";
-import { useEffect, useState } from "react"; // Import useState
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 import { z } from "zod";
-import CustomQuestions from "./test.jsx"; // Import the new component
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -35,11 +34,6 @@ const schema = z.object({
 const PostJob = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const [showQuestions, setShowQuestions] = useState(false); // State to control visibility
-
-  const handleAddMoreQuestions = () => {
-    setShowQuestions((prev) => !prev); // Toggle visibility
-  };
 
   const {
     register,
@@ -50,20 +44,23 @@ const PostJob = () => {
     defaultValues: { location: "", company_id: "", requirments: "" },
     resolver: zodResolver(schema),
   });
-
   const {
     loading: loadingCreateJob,
     error: errorCreateJob,
     data: dataCreateJob,
     fn: fnCreateJob,
-  } = useFetch(addNewJob);
+  } = useFetch((token, jobData, questions) => addNewJob(token, jobData, questions));
 
   const onSubmit = (data) => {
-    fnCreateJob({
+    // Prepare the job data, including questions if available
+    const jobData = {
       ...data,
       recruiter_id: user.id,
       isOpen: true,
-    });
+    };
+
+     // Submit job data along with questions
+  fnCreateJob(jobData, questions.length > 0 ? questions : undefined);
   };
 
   useEffect(() => {
@@ -81,6 +78,34 @@ const PostJob = () => {
       fnCompanies();
     }
   }, [isLoaded]);
+
+  const [questions, setQuestions] = useState([]);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newOptions, setNewOptions] = useState(["", "", "", ""]);
+  const [correctOption, setCorrectOption] = useState(null);
+
+  const addQuestion = () => {
+    if (!newQuestion.trim() || correctOption === null || newOptions.some(opt => !opt.trim())) {
+      alert("Please fill out the question, options, and select a correct option.");
+      return;
+    }
+
+    const newQuestionObj = {
+      id: questions.length + 1,
+      question: newQuestion,
+      options: newOptions,
+      correctOption,
+    };
+
+    setQuestions([...questions, newQuestionObj]);
+    setNewQuestion("");
+    setNewOptions(["", "", "", ""]);
+    setCorrectOption(null);
+  };
+
+  const removeQuestion = (id) => {
+    setQuestions(questions.filter((q) => q.id !== id));
+  };
 
   if (!isLoaded || loadingCompanies) {
     return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;
@@ -177,22 +202,81 @@ const PostJob = () => {
         )}
         {loadingCreateJob && <BarLoader width={"100%"} color="#36d7b7" />}
 
-        {/* Add more questions */}
-        <Button
-          type="button"
-          variant="link"
-          size="lg"
-          className="mt-2"
-          onClick={handleAddMoreQuestions}
-        >
-          {showQuestions ? "Hide Questions" : "Add More Questions"}
-        </Button>
+        {/* Custom Questions - Always Visible */}
+        <div className="mt-4 p-6 max-w-6xl mx-auto bg-gray-900 text-white">
+          <header className="mb-8 flex items-center justify-between">
+            <h1 className="text-3xl font-bold">Manage MCQ Questions</h1>
+          </header>
 
-        {showQuestions && (
-          <div className="mt-4">
-            <CustomQuestions />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {questions.map((question) => (
+              <div
+                key={question.id}
+                className="bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              >
+                <h2 className="font-semibold text-lg mb-2">{question.question}</h2>
+                <ul className="list-disc list-inside space-y-1">
+                  {question.options.map((option, index) => (
+                    <li
+                      key={index}
+                      className={`${
+                        question.correctOption === index ? "text-green-400 font-bold" : ""
+                      }`}
+                    >
+                      {option}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => removeQuestion(question.id)}
+                  className="text-red-500 mt-4 hover:underline"
+                >
+                  Remove Question
+                </button>
+              </div>
+            ))}
           </div>
-        )}
+
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-4">Add a New MCQ Question</h2>
+            <textarea
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              placeholder="Enter your MCQ question"
+              className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 mb-4 placeholder-gray-400"
+            ></textarea>
+
+            {newOptions.map((option, index) => (
+              <div key={index} className="mb-3 flex items-center gap-4">
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => {
+                    const updatedOptions = [...newOptions];
+                    updatedOptions[index] = e.target.value;
+                    setNewOptions(updatedOptions);
+                  }}
+                  placeholder={`Option ${index + 1}`}
+                  className="flex-1 p-3 rounded-lg bg-gray-800 text-white border border-gray-700 placeholder-gray-400"
+                />
+                <input
+                  type="radio"
+                  checked={correctOption === index}
+                  onChange={() => setCorrectOption(index)}
+                  className="form-radio text-blue-500"
+                />
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addQuestion}
+              className="bg-blue-600 px-6 py-2 rounded-lg text-white hover:bg-blue-700"
+            >
+              Add Question
+            </button>
+          </div>
+        </div>
 
         <Button type="submit" variant="blue" size="lg" className="mt-2">
           Submit
