@@ -1,6 +1,7 @@
 import supabaseClient from "@/utils/supabase";
 
 // Fetch Jobs
+// Fetch Jobs
 export async function getJobs(token, { location, company_id, searchQuery }) {
   const supabase = await supabaseClient(token);
   let query = supabase
@@ -150,10 +151,14 @@ export async function deleteJob(token, { job_id }) {
   return data;
 }
 
-// - post job
-export async function addNewJob(token, _, jobData) {
+export async function addNewJob(token,questions,jobData){
   const supabase = await supabaseClient(token);
 
+  // First create the job as before
+  if(jobData===undefined){
+    throw new Error("Job data is required");
+    return data;
+  }
   const { data, error } = await supabase
     .from("jobs")
     .insert([jobData])
@@ -164,30 +169,37 @@ export async function addNewJob(token, _, jobData) {
     throw new Error("Error Creating Job");
   }
 
+  console.log("Job Created with ID:", data[0]?.id);
+  // Log received questions (optional, for debugging)
+  console.log("Received questions:", questions);
+
   return data;
 }
 
-export async function addQuestionToDatabase(token, questionData) {
+
+// In apiJobs.js or apiQuestions.js
+export async function saveJobQuestion(token, question, jobId) {
   const supabase = await supabaseClient(token);
 
-  // Assuming the questions table has fields: question, option1, option2, option3, option4, ans
+  // Transform single question to match database format
+  const formattedQuestion = {
+    question: question.question,
+    option1: question.options[0],
+    option2: question.options[1],
+    option3: question.options[2],
+    option4: question.options[3],
+    ans: question.correctOption + 1, // Adding 1 since we're using 0-based index in UI
+    jobid: jobId
+  };
+
   const { data, error } = await supabase
-    .from("questions")
-    .insert([
-      {
-        question: questionData.question,
-        option1: questionData.option1,
-        option2: questionData.option2,
-        option3: questionData.option3,
-        option4: questionData.option4,
-        ans: questionData.ans,  // This corresponds to the index of the correct option
-      },
-    ])
+    .from("question")
+    .insert([formattedQuestion])
     .select();
 
   if (error) {
     console.error(error);
-    throw new Error("Error saving question to the database");
+    throw new Error("Error Creating Question");
   }
 
   return data;

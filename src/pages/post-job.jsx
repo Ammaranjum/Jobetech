@@ -52,16 +52,20 @@ const PostJob = () => {
   } = useFetch((token, jobData, questions) => addNewJob(token, jobData, questions));
 
   const onSubmit = (data) => {
-    // Prepare the job data, including questions if available
+    // Prepare the job data
     const jobData = {
       ...data,
       recruiter_id: user.id,
       isOpen: true,
     };
-
-     // Submit job data along with questions
-  fnCreateJob(jobData, questions.length > 0 ? questions : undefined);
+  
+    console.log("Job Content:", jobData);
+    console.log("Questions in Postjob:", questions);
+  
+    // Submit job data along with questions (if any)
+    fnCreateJob(jobData, questions.length > 0 ? questions : undefined);
   };
+
 
   useEffect(() => {
     if (dataCreateJob?.length > 0) navigate("/jobs");
@@ -202,7 +206,7 @@ const PostJob = () => {
         )}
         {loadingCreateJob && <BarLoader width={"100%"} color="#36d7b7" />}
 
-        {/* Custom Questions - Always Visible */}
+        
         <div className="mt-4 p-6 max-w-6xl mx-auto bg-gray-900 text-white">
           <header className="mb-8 flex items-center justify-between">
             <h1 className="text-3xl font-bold">Manage MCQ Questions</h1>
