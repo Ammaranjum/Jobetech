@@ -44,32 +44,56 @@ const PostJob = () => {
     defaultValues: { location: "", company_id: "", requirments: "" },
     resolver: zodResolver(schema),
   });
+
   const {
     loading: loadingCreateJob,
     error: errorCreateJob,
     data: dataCreateJob,
     fn: fnCreateJob,
-  } = useFetch((token, jobData, questions) => addNewJob(token, jobData, questions));
+  } = useFetch((token, options, questions, jobData) => {
+    return addNewJob(token, questions, jobData);
+  });
 
-  const onSubmit = (data) => {
-    // Prepare the job data
+  const onSubmit = async (data) => {
     const jobData = {
       ...data,
       recruiter_id: user.id,
       isOpen: true,
     };
-  
+
     console.log("Job Content:", jobData);
     console.log("Questions in Postjob:", questions);
-  
-    // Submit job data along with questions (if any)
-    fnCreateJob(jobData, questions.length > 0 ? questions : undefined);
+
+    try {
+      const response = await fnCreateJob(questions, jobData);
+
+      if (response.success) {
+        console.log("Job Created with ID:", response.jobId);
+        navigate("/jobs");
+      } else {
+        // Handle the error case properly
+        console.error("Failed to create job:", response.error);
+        // Maybe show an error message to the user
+        // setError(response.error); // if you have error state
+      }
+    } catch (error) {
+      console.error("Error creating job or saving questions:", error);
+    }
   };
 
+  useEffect(() => {
+    if (dataCreateJob) {
+      console.log("Job data:", dataCreateJob);
+      navigate("/jobs");
+    }
+  }, [dataCreateJob]);
 
   useEffect(() => {
-    if (dataCreateJob?.length > 0) navigate("/jobs");
-  }, [dataCreateJob]);
+    if (errorCreateJob) {
+      console.error("Error occurred:", errorCreateJob);
+      // Handle error (show message, etc.)
+    }
+  }, [errorCreateJob]);
 
   const {
     loading: loadingCompanies,
@@ -89,8 +113,14 @@ const PostJob = () => {
   const [correctOption, setCorrectOption] = useState(null);
 
   const addQuestion = () => {
-    if (!newQuestion.trim() || correctOption === null || newOptions.some(opt => !opt.trim())) {
-      alert("Please fill out the question, options, and select a correct option.");
+    if (
+      !newQuestion.trim() ||
+      correctOption === null ||
+      newOptions.some((opt) => !opt.trim())
+    ) {
+      alert(
+        "Please fill out the question, options, and select a correct option."
+      );
       return;
     }
 
@@ -206,7 +236,6 @@ const PostJob = () => {
         )}
         {loadingCreateJob && <BarLoader width={"100%"} color="#36d7b7" />}
 
-        
         <div className="mt-4 p-6 max-w-6xl mx-auto bg-gray-900 text-white">
           <header className="mb-8 flex items-center justify-between">
             <h1 className="text-3xl font-bold">Manage MCQ Questions</h1>
@@ -218,13 +247,17 @@ const PostJob = () => {
                 key={question.id}
                 className="bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
               >
-                <h2 className="font-semibold text-lg mb-2">{question.question}</h2>
+                <h2 className="font-semibold text-lg mb-2">
+                  {question.question}
+                </h2>
                 <ul className="list-disc list-inside space-y-1">
                   {question.options.map((option, index) => (
                     <li
                       key={index}
                       className={`${
-                        question.correctOption === index ? "text-green-400 font-bold" : ""
+                        question.correctOption === index
+                          ? "text-green-400 font-bold"
+                          : ""
                       }`}
                     >
                       {option}

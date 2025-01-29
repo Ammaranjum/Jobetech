@@ -149,58 +149,69 @@ export async function deleteJob(token, { job_id }) {
   }
 
   return data;
+
 }
 
-export async function addNewJob(token,questions,jobData){
+//add a job
+
+export async function addNewJob(token, questions, jobData) {
   const supabase = await supabaseClient(token);
+ console.log("jobData",jobData)
+ console.log("questions",questions)
+  try {
+    // Insert the job and retrieve the job ID
+    const { data: jobDataResponse, error: jobError } = await supabase
+      .from("jobs")
+      .insert([jobData])
+      .select();
 
-  // First create the job as before
-  if(jobData===undefined){
-    throw new Error("Job data is required");
-    return data;
+    if (jobError) {
+      console.error("Error inserting job:", jobError);
+      return { success: false, error: "Failed to create job." };
+    }
+
+    const jobId = jobDataResponse[0]?.id;
+
+    console.log("Job Created with ID:", jobId);
+
+    if (!jobId) {
+      return { success: false, error: "Failed to retrieve job ID after insertion." };
+    }
+
+    // Check if questions are valid
+    if (!questions || questions.length === 0) {
+      return { success: false, error: "No questions provided to save." };
+    }
+
+    // Map questions to DB format
+    const questionEntries = questions.map((question) => ({
+      questionString: question.question || "No question provided",
+      option1: question.options[0] ,
+      option2: question.options[1],
+      option3: question.options[2] ,
+      option4: question.options[3] ,
+      ans: question.correctOption,
+      job_id: jobId,
+    }));
+
+    console.log("Mapped question entries before DB insertion:", questionEntries);
+
+    // Insert questions into the database
+    const { data: questionsData, error: questionsError } = await supabase
+      .from("question")
+      .insert(questionEntries)
+      .select();
+
+    if (questionsError) {
+      console.error("Error inserting questions:", questionsError);
+      return { success: false, error: "Failed to save questions." };
+    }
+
+    console.log("Questions added successfully:", questionsData);
+
+    return jobDataResponse;
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return { success: false, error: "Unexpected error occurred." };
   }
-  const { data, error } = await supabase
-    .from("jobs")
-    .insert([jobData])
-    .select();
-
-  if (error) {
-    console.error(error);
-    throw new Error("Error Creating Job");
-  }
-
-  console.log("Job Created with ID:", data[0]?.id);
-  // Log received questions (optional, for debugging)
-  console.log("Received questions:", questions);
-
-  return data;
-}
-
-
-// In apiJobs.js or apiQuestions.js
-export async function saveJobQuestion(token, question, jobId) {
-  const supabase = await supabaseClient(token);
-
-  // Transform single question to match database format
-  const formattedQuestion = {
-    question: question.question,
-    option1: question.options[0],
-    option2: question.options[1],
-    option3: question.options[2],
-    option4: question.options[3],
-    ans: question.correctOption + 1, // Adding 1 since we're using 0-based index in UI
-    jobid: jobId
-  };
-
-  const { data, error } = await supabase
-    .from("question")
-    .insert([formattedQuestion])
-    .select();
-
-  if (error) {
-    console.error(error);
-    throw new Error("Error Creating Question");
-  }
-
-  return data;
 }
