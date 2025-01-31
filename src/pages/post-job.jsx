@@ -149,6 +149,14 @@ const PostJob = () => {
     return <Navigate to="/jobs" />;
   }
 
+
+
+
+  const openPdfInNewTab = () => {
+    const pdfUrl = 'https://zivmzxapgocoikohtyvo.supabase.co/storage/v1/object/public/pdf_file//Goku.pdf'; // Replace with your actual public URL
+    window.open(pdfUrl, '_blank');
+  };
+
   return (
     <div>
       <h1 className="gradient-title font-extrabold text-5xl sm:text-7xl text-center pb-8">
@@ -196,7 +204,7 @@ const PostJob = () => {
                   <SelectValue placeholder="Company">
                     {field.value
                       ? companies?.find((com) => com.id === Number(field.value))
-                          ?.name
+                        ?.name
                       : "Company"}
                   </SelectValue>
                 </SelectTrigger>
@@ -236,9 +244,26 @@ const PostJob = () => {
         )}
         {loadingCreateJob && <BarLoader width={"100%"} color="#36d7b7" />}
 
-        <div className="mt-4 p-6 max-w-6xl mx-auto bg-gray-900 text-white">
+        <div className="mt-4 p-6 max-w-full bg-gray-900 text-white">
           <header className="mb-8 flex items-center justify-between">
             <h1 className="text-3xl font-bold">Manage MCQ Questions</h1>
+
+            {/* <button class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
+              <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                Pink to orange
+              </span>
+            </button> */}
+
+
+            <button type="button"
+              onClick={openPdfInNewTab}
+              className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+            >
+              <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+                Open PDF
+              </span>
+            </button>
+
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -254,11 +279,10 @@ const PostJob = () => {
                   {question.options.map((option, index) => (
                     <li
                       key={index}
-                      className={`${
-                        question.correctOption === index
-                          ? "text-green-400 font-bold"
-                          : ""
-                      }`}
+                      className={`${question.correctOption === index
+                        ? "text-green-400 font-bold"
+                        : ""
+                        }`}
                     >
                       {option}
                     </li>
