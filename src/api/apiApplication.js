@@ -1,8 +1,45 @@
 import supabaseClient, { supabaseUrl } from "@/utils/supabase";
+//fetch questions
+
+export async function getQuestions(token, _, job_id) {
+  console.log("geting QuestionsForJob", job_id);
+  console.log("token", token);
+  const supabase = await supabaseClient(token);
+  const { data, error } = await supabase
+    .from("question")
+    .select("*")
+    .eq("job_id", job_id);
+  console.log("questions having Job id we r going to passed ", data);
+  if (error) {
+    console.error("Error fetching Questions:", error);
+    return null;
+  }
+
+  return data;
+}
 
 // - Apply to job ( candidate )
 export async function applyToJob(token, _, jobData) {
+  console.log(" jobdata  ", jobData);
+  console.log("score in apply job ", jobData.score);
+  console.log("total score in apply ", jobData.totalscore);
+
   const supabase = await supabaseClient(token);
+
+  const formData = new FormData();
+  formData.append("pdf", jobData.resume);
+
+  const response = await fetch("http://127.0.0.1:5000/extract-text", {
+    method: "POST",
+    body: formData,
+  });
+  // console.log(response);
+  if (!response.ok) {
+    throw new Error("Error extracting text from resume");
+  }
+
+  const extractedData = await response.json();
+  console.log("Extracted Data:", extractedData);
 
   const random = Math.floor(Math.random() * 90000);
   const fileName = `resume-${random}-${jobData.candidate_id}`;
