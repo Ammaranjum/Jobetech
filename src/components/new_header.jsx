@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import AnalyticsPage from "@/pages/analytics";
 import {
   SignedIn,
   SignedOut,
@@ -33,18 +34,28 @@ const New_header = () => {
     <>
       <nav className="py-4 flex justify-between items-center">
         <Link to="/">
-        <img src="/logo_new2-Photoroom-removebg-preview.png" className="h-20 thepa" alt="Hirrd Logo" />
-         
+          <img
+            src="/logo_new2-Photoroom-removebg-preview.png"
+            className="h-20 thepa"
+            alt="Hirrd Logo"
+          />
+        </Link>
 
-
+        <Link to="/analytics">
+          <Button variant="ghost">Analytics</Button>
         </Link>
 
         <div className="flex gap-8">
           <SignedOut>
-            <Button variant="outline" className="z-20" onClick={() => setShowSignIn(true)}>
+            <Button
+              variant="outline"
+              className="z-20"
+              onClick={() => setShowSignIn(true)}
+            >
               Login
             </Button>
           </SignedOut>
+
           <SignedIn>
             {user?.unsafeMetadata?.role === "recruiter" && (
               <Link to="/post-job">
