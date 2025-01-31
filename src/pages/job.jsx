@@ -1,8 +1,8 @@
-
 import { useEffect } from "react";
 import { BarLoader } from "react-spinners";
 import MDEditor from "@uiw/react-md-editor";
 import { useParams } from "react-router-dom";
+import { getQuestions } from "@/api/apiApplication";
 import { useUser } from "@clerk/clerk-react";
 import { Briefcase, DoorClosed, DoorOpen, MapPinIcon } from "lucide-react";
 
@@ -22,6 +22,22 @@ import { getSingleJob, updateHiringStatus } from "@/api/apiJobs";
 const JobPage = () => {
   const { id } = useParams();
   const { isLoaded, user } = useUser();
+
+  console.log("id in the main job page ", id);
+
+  const {
+    loading: loadingQuestions,
+    data: questions,
+    fn: fetchQuestions,
+  } = useFetch(getQuestions, { id });
+
+  useEffect(() => {
+    if (id) {
+      fetchQuestions(id); // Pass jobId to fetch questions related to that job
+    }
+  }, [id]);
+
+  console.log("questions came back in the main job page ", questions);
 
   const {
     loading: loadingJob,
@@ -61,17 +77,17 @@ const JobPage = () => {
       </div>
 
       <div className="flex justify-between text-gray-700">
-  {/* Job Location */}
-  <div className="flex gap-2 items-center">
-    <MapPinIcon className="text-blue-500" /> 
-    <span>{job?.location}</span>
-  </div>
+        {/* Job Location */}
+        <div className="flex gap-2 items-center">
+          <MapPinIcon className="text-blue-500" />
+          <span>{job?.location}</span>
+        </div>
 
-  {/* Number of Applicants */}
-  <div className="flex gap-2 items-center">
-    <Briefcase className="text-green-500" /> 
-    <span>{job?.applications?.length} Applicants</span>
-  </div>
+        {/* Number of Applicants */}
+        <div className="flex gap-2 items-center">
+          <Briefcase className="text-green-500" />
+          <span>{job?.applications?.length} Applicants</span>
+        </div>
         <div className="flex gap-2">
           {job?.isOpen ? (
             <>
@@ -123,6 +139,7 @@ const JobPage = () => {
           user={user}
           fetchJob={fnJob}
           applied={job?.applications?.find((ap) => ap.candidate_id === user.id)}
+          questions={questions} // Pass questions to the ApplyJobDrawer
         />
       )}
       {loadingHiringStatus && <BarLoader width={"100%"} color="#36d7b7" />}
