@@ -8,7 +8,7 @@ import {
 
 const Newfooter = () => {
   return (
-    <section className="p-10 shadow-lg rounded-lg mb-5 bg-gray-800">
+    <section className="p-10 shadow-lg shadow-white/30 rounded-lg mb-5 bg-gray-800">
       <section className="text-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

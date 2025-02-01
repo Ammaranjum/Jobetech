@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
-import { Boxes, BriefcaseBusiness, Download, School } from "lucide-react";
+import useFetch from "@/hooks/use-fetch";
+import { updateApplicationStatus } from "../api/apiApplication";
+import { BriefcaseBusiness, School, Boxes, Download } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,8 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { updateApplicationStatus } from "@/api/apiApplication";
-import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
 
 const ApplicationCard = ({ application, isCandidate = false }) => {
@@ -38,59 +38,100 @@ const ApplicationCard = ({ application, isCandidate = false }) => {
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       {loadingHiringStatus && <BarLoader width={"100%"} color="#36d7b7" />}
-      <CardHeader>
-        <CardTitle className="flex justify-between font-bold">
-          {isCandidate
-            ? `${application?.job?.title} at ${application?.job?.company?.name}`
-            : application?.name}
+      <CardHeader className="p-4">
+        <CardTitle className="flex justify-between items-center font-bold text-lg">
+          <span>{application?.name}</span>
           <Download
             size={18}
-            className="bg-white text-black rounded-full h-8 w-8 p-1.5 cursor-pointer"
+            className="bg-white text-black rounded-full h-8 w-8 p-1.5 cursor-pointer hover:bg-gray-100 transition-colors"
             onClick={handleDownload}
           />
+          <span className="text-sm text-gray-500">
+            Applied on: {new Date(application?.created_at).toLocaleDateString()}
+          </span>
+          {isCandidate ? (
+            <span className="capitalize font-bold text-sm">
+              Status: {application.status}
+            </span>
+          ) : (
+            <Select
+              onValueChange={handleStatusChange}
+              defaultValue={application.status}
+              disabled={loadingHiringStatus}
+            >
+              <SelectTrigger className="w-40">
+                {loadingHiringStatus ? (
+                  <span>Updating...</span>
+                ) : (
+                  <SelectValue placeholder="Application Status" />
+                )}
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Applied">Applied</SelectItem>
+                <SelectItem value="interviewing">Interviewing</SelectItem>
+                <SelectItem value="hired">Hired</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4 flex-1">
-        <div className="flex flex-col md:flex-row justify-between">
-          <div className="flex gap-2 items-center">
-            <BriefcaseBusiness size={15} /> {application?.experience} years of
-            experience
+      <CardContent className="p-4">
+        {/* Compact Grid Layout for Applicant Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          {/* Column 1 */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Email:</span>
+              <span className="text-gray-600">{application?.email}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Phone:</span>
+              <span className="text-gray-600">{application?.phone}</span>
+            </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <School size={15} />
-            {application?.education}
+
+          {/* Column 2 */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">City:</span>
+              <span className="text-gray-600">{application?.city}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">CV Score:</span>
+              <span className="text-gray-600">{application?.cvScore}</span>
+            </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <Boxes size={15} /> Skills: {application?.skills}
+
+          {/* Column 3 */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <BriefcaseBusiness size={15} className="text-gray-500" />
+              <span>{application?.experience} years of experience</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <School size={15} className="text-gray-500" />
+              <span>{application?.education}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Boxes size={15} className="text-gray-500" />
+              <span>Skills: {application?.skills}</span>
+            </div>
+          </div>
+
+          {/* Merged Row */}
+          <div className="col-span-2 space-y-2">
+            <div className="flex items-center">
+              <span className="font-semibold">Recommender Feedback:</span>
+              <span className="text-gray-600">
+                {application?.feedback || "No feedback provided"}
+              </span>
+            </div>
           </div>
         </div>
-        <hr />
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <span>{new Date(application?.created_at).toLocaleString()}</span>
-        {isCandidate ? (
-          <span className="capitalize font-bold">
-            Status: {application.status}
-          </span>
-        ) : (
-          <Select
-            onValueChange={handleStatusChange}
-            defaultValue={application.status}
-          >
-            <SelectTrigger className="w-52">
-              <SelectValue placeholder="Application Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Applied">Applied</SelectItem>
-              <SelectItem value="interviewing">Interviewing</SelectItem>
-              <SelectItem value="hired">Hired</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-        )}
-      </CardFooter>
     </Card>
   );
 };

@@ -10,8 +10,7 @@ const AppLayout = () => {
         <New_header />
         <Outlet />
       </main>
-      {/* /footer Componnent should be written here */}
-      
+      {/* // footer will do abdullah */}
     </div>
   );
 };

@@ -149,12 +149,10 @@ const PostJob = () => {
     return <Navigate to="/jobs" />;
   }
 
-
-
-
   const openPdfInNewTab = () => {
-    const pdfUrl = 'https://zivmzxapgocoikohtyvo.supabase.co/storage/v1/object/public/pdf_file//Goku.pdf'; // Replace with your actual public URL
-    window.open(pdfUrl, '_blank');
+    const pdfUrl =
+      "https://zivmzxapgocoikohtyvo.supabase.co/storage/v1/object/public/pdf_file//QuestionsBank.pdf"; // Replace with your actual public URL
+    window.open(pdfUrl, "_blank");
   };
 
   return (
@@ -204,7 +202,7 @@ const PostJob = () => {
                   <SelectValue placeholder="Company">
                     {field.value
                       ? companies?.find((com) => com.id === Number(field.value))
-                        ?.name
+                          ?.name
                       : "Company"}
                   </SelectValue>
                 </SelectTrigger>
@@ -254,16 +252,15 @@ const PostJob = () => {
               </span>
             </button> */}
 
-
-            <button type="button"
+            <button
+              type="button"
               onClick={openPdfInNewTab}
               className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
             >
               <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-                Open PDF
+                See Questions Bank
               </span>
             </button>
-
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -279,10 +276,11 @@ const PostJob = () => {
                   {question.options.map((option, index) => (
                     <li
                       key={index}
-                      className={`${question.correctOption === index
-                        ? "text-green-400 font-bold"
-                        : ""
-                        }`}
+                      className={`${
+                        question.correctOption === index
+                          ? "text-green-400 font-bold"
+                          : ""
+                      }`}
                     >
                       {option}
                     </li>

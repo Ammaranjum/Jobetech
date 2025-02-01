@@ -18,8 +18,29 @@ export async function getQuestions(token, _, job_id) {
   return data;
 }
 
+// fetch requirements
+export async function getRequirements(token, job_id) {
+  console.log("geting RequirementsForJob", job_id);
+  console.log("token", token);
+  const supabase = await supabaseClient(token);
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("requirments")
+    .eq("id", job_id);
+
+  if (error) {
+    console.error("Error fetching Requirements:", error);
+    return null;
+  }
+
+  console.log("requirements in getRequirements", data[0].requirments);
+  return data;
+}
+
 // - Apply to job ( candidate )
 export async function applyToJob(token, _, jobData) {
+  const requirements = await getRequirements(token, jobData.job_id);
+  console.log("requirements in aplyjob ", requirements[0]);
   console.log(" jobdata  ", jobData);
   console.log("score in apply job ", jobData.score);
   console.log("total score in apply ", jobData.totalscore);
@@ -28,6 +49,7 @@ export async function applyToJob(token, _, jobData) {
 
   const formData = new FormData();
   formData.append("pdf", jobData.resume);
+  formData.append("requirements", JSON.stringify(requirements[0]));
 
   const response = await fetch("http://127.0.0.1:5000/extract-text", {
     method: "POST",
@@ -39,7 +61,8 @@ export async function applyToJob(token, _, jobData) {
   }
 
   const extractedData = await response.json();
-  console.log("Extracted Data:", extractedData);
+  console.log("Extracted Data score only :", extractedData.score);
+  console.log("Extracted Feedback :", extractedData.feedback);
 
   const random = Math.floor(Math.random() * 90000);
   const fileName = `resume-${random}-${jobData.candidate_id}`;
@@ -58,6 +81,8 @@ export async function applyToJob(token, _, jobData) {
       {
         ...jobData,
         resume,
+        cvScore: extractedData.score, // Add CV score
+        feedback: extractedData.feedback, // Add feedback
       },
     ])
     .select();

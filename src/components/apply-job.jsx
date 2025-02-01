@@ -23,6 +23,16 @@ import { applyToJob } from "@/api/apiApplication";
 import { BarLoader } from "react-spinners";
 
 const schema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  phone: z
+    .string()
+    .min(10, { message: "Phone number must be at least 10 digits" }),
+  cgpa: z
+    .number()
+    .min(0, { message: "CGPA must be at least 0" })
+    .max(4, { message: "CGPA must be at most 4" }),
+  city: z.string().min(1, { message: "City is required" }),
   experience: z
     .number()
     .min(0, { message: "Experience must be at least 0" })
@@ -33,13 +43,9 @@ const schema = z.object({
   }),
   resume: z
     .any()
-    .refine(
-      (file) =>
-        file[0] &&
-        (file[0].type === "application/pdf" ||
-          file[0].type === "application/msword"),
-      { message: "Only PDF or Word documents are allowed" }
-    ),
+    .refine((file) => file[0] && file[0].type === "application/pdf", {
+      message: "Only PDF documents are allowed",
+    }),
 });
 
 export function ApplyJobDrawer({
@@ -51,6 +57,7 @@ export function ApplyJobDrawer({
 }) {
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileName, setFileName] = useState(""); // Added for file name tracking
 
   const {
     register,
@@ -67,13 +74,13 @@ export function ApplyJobDrawer({
     let totalscore = questions ? questions.length : 0;
 
     questions?.forEach((question) => {
-      const selectedOption = answers[question.id]; // e.g., "option1", "option2", etc.
+      const selectedOption = answers[question.id];
       const selectedIndex = [
         "option1",
         "option2",
         "option3",
         "option4",
-      ].indexOf(selectedOption); // Map to index (0, 1, 2, 3)
+      ].indexOf(selectedOption);
 
       if (selectedIndex === question.ans) {
         score++;
@@ -96,7 +103,6 @@ export function ApplyJobDrawer({
       ...data,
       job_id: job.id,
       candidate_id: user.id,
-      name: user.fullName,
       status: "Applied",
       resume: data.resume[0],
       score,
@@ -105,6 +111,7 @@ export function ApplyJobDrawer({
       fetchJob();
       reset();
       setAnswers({});
+      setFileName(""); // Reset file name after submission
     });
   };
 
@@ -113,6 +120,15 @@ export function ApplyJobDrawer({
       ...prevAnswers,
       [questionId]: value,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileName(file.name); // Set file name when a file is selected
+    } else {
+      setFileName(""); // Reset file name if no file is selected
+    }
   };
 
   return (
@@ -134,12 +150,12 @@ export function ApplyJobDrawer({
       </DrawerTrigger>
       <DrawerContent
         disableOverlayClick
-        disableswipe
+        disableSwipe
         style={{
-          maxHeight: "90vh", // Ensure the drawer doesn't exceed the viewport height
+          maxHeight: "90vh",
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden", // Prevent double scrollbars
+          overflow: "hidden",
         }}
       >
         {/* Header */}
@@ -147,7 +163,9 @@ export function ApplyJobDrawer({
           <DrawerTitle>
             Apply for {job?.title} at {job?.company?.name}
           </DrawerTitle>
-          <DrawerDescription>Please Fill the form below</DrawerDescription>
+          <DrawerDescription>
+            Please Fill Form and Dont Forget to Solve the MCQS Based Test
+          </DrawerDescription>
         </DrawerHeader>
 
         {/* Scrollable Form */}
@@ -156,26 +174,84 @@ export function ApplyJobDrawer({
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
+            {/* Name */}
+            <Input
+              type="text"
+              placeholder="Full Name"
+              className="flex-1"
+              {...register("name")}
+            />
+            {errors.name && (
+              <p className="text-red-500">{errors.name.message}</p>
+            )}
+
+            {/* Email */}
+            <Input
+              type="email"
+              placeholder="Email"
+              className="flex-1"
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="text-red-500">{errors.email.message}</p>
+            )}
+
+            {/* Phone */}
+            <Input
+              type="text"
+              placeholder="Phone Number"
+              className="flex-1"
+              {...register("phone")}
+            />
+            {errors.phone && (
+              <p className="text-red-500">{errors.phone.message}</p>
+            )}
+
+            {/* CGPA */}
             <Input
               type="number"
-              placeholder="Years of Experience"
+              placeholder="CGPA"
               className="flex-1"
-              {...register("experience", {
-                valueAsNumber: true,
-              })}
+              {...register("cgpa", { valueAsNumber: true })}
+            />
+            {errors.cgpa && (
+              <p className="text-red-500">{errors.cgpa.message}</p>
+            )}
+
+            {/* City */}
+            <Input
+              type="text"
+              placeholder="City"
+              className="flex-1"
+              {...register("city")}
+            />
+            {errors.city && (
+              <p className="text-red-500">{errors.city.message}</p>
+            )}
+
+            {/* Years of Experience */}
+            <Input
+              type="number"
+              placeholder=" Relevant Experience in Years "
+              className="flex-1"
+              {...register("experience", { valueAsNumber: true })}
             />
             {errors.experience && (
               <p className="text-red-500">{errors.experience.message}</p>
             )}
+
+            {/* Skills */}
             <Input
               type="text"
-              placeholder="Skills (Comma Separated)"
+              placeholder="Tools and Technologies you are confident (Comma Seprated only) "
               className="flex-1"
               {...register("skills")}
             />
             {errors.skills && (
               <p className="text-red-500">{errors.skills.message}</p>
             )}
+
+            {/* Education */}
             <Controller
               name="education"
               control={control}
@@ -199,28 +275,63 @@ export function ApplyJobDrawer({
             {errors.education && (
               <p className="text-red-500">{errors.education.message}</p>
             )}
-            <Input
-              type="file"
-              accept=".pdf, .doc, .docx"
-              className="flex-1 file:text-gray-500"
-              {...register("resume")}
-            />
-            {errors.resume && (
-              <p className="text-red-500">{errors.resume.message}</p>
-            )}
 
+            {/* CV Upload */}
             <div className="mt-4">
+              <label className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed border-[#60a5fa] rounded-lg bg-[#1f2937] hover:bg-[#374151] transition-all cursor-pointer">
+                {fileName ? (
+                  <span className="text-gray-200 text-base font-semibold mb-2">
+                    {fileName}
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-gray-200 text-base font-semibold mb-2">
+                      Upload Your CV
+                    </span>
+                    <span className="text-gray-400 text-sm">
+                      (Supports .pdf only)
+                    </span>
+                  </>
+                )}
+                <Input
+                  type="file"
+                  accept=".pdf, .doc, .docx"
+                  className="hidden"
+                  {...register("resume", { onChange: handleFileChange })}
+                />
+              </label>
+              {errors.resume && (
+                <p className="text-red-500 text-sm mt-2">
+                  {errors.resume.message}
+                </p>
+              )}
+            </div>
+
+            {/* Questions */}
+            <h2 className="text-xl font-semibold text-gray-100 mt-6">
+              Answers these Questions
+            </h2>
+            <div className="mt-4 space-y-4">
               {questions?.map((question) => (
-                <div key={question.id} className="mb-4">
-                  <p>{question.questionString}</p>
-                  <div className="flex space-x-4">
+                <div
+                  key={question.id}
+                  className="bg-[#374151] p-4 rounded-lg shadow-md border border-[#4b5563]"
+                >
+                  <p className="text-base font-semibold text-gray-100 mb-2">
+                    {question.questionString}
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
                       question.option1,
                       question.option2,
                       question.option3,
                       question.option4,
                     ].map((option, index) => (
-                      <div key={index}>
+                      <label
+                        key={index}
+                        htmlFor={`${question.id}-option${index + 1}`}
+                        className="flex items-center space-x-2 p-2 rounded-md border border-[#4b5563] hover:border-[#60a5fa] bg-[#1f2937] cursor-pointer transition-all"
+                      >
                         <input
                           type="radio"
                           id={`${question.id}-option${index + 1}`}
@@ -229,17 +340,16 @@ export function ApplyJobDrawer({
                           onChange={(e) =>
                             handleAnswerChange(question.id, e.target.value)
                           }
+                          className="form-radio h-4 w-4 text-[#60a5fa]"
                         />
-                        <Label htmlFor={`${question.id}-option${index + 1}`}>
-                          {option}
-                        </Label>
-                      </div>
+                        <span className="text-sm text-gray-200">{option}</span>
+                      </label>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
-
+            {/* Error and Loading */}
             {errorApply?.message && (
               <p className="text-red-500">{errorApply?.message}</p>
             )}
@@ -247,7 +357,7 @@ export function ApplyJobDrawer({
           </form>
         </div>
 
-        {/* Fixed Footer */}
+        {/* Footer */}
         <DrawerFooter
           style={{ padding: "1rem", borderTop: "1px solid #e5e7eb" }}
         >
@@ -256,7 +366,7 @@ export function ApplyJobDrawer({
             variant="blue"
             size="lg"
             disabled={isSubmitting}
-            onClick={handleSubmit(onSubmit)} // Ensure the form is submitted
+            onClick={handleSubmit(onSubmit)}
           >
             {isSubmitting ? "Submitting..." : "Apply"}
           </Button>

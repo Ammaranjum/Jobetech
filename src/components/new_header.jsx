@@ -41,9 +41,9 @@ const New_header = () => {
           />
         </Link>
 
-        <Link to="/analytics">
+        {/* <Link to="/analytics">
           <Button variant="ghost">Analytics</Button>
-        </Link>
+        </Link> */}
 
         <div className="flex gap-8">
           <SignedOut>

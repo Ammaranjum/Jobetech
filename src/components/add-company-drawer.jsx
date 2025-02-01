@@ -84,7 +84,6 @@ const AddCompanyDrawer = ({ fetchCompanies }) => {
             {...register("logo")}
           />
 
-          {/* Add Button */}
           <Button
             type="button"
             onClick={handleSubmit(onSubmit)}
